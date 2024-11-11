@@ -1,0 +1,36 @@
+
+create table o_rollcall(roll_number NUMBER(10) PRIMARY KEY, name VARCHAR(50));
+create table n_rollcall(roll_number NUMBER(10) PRIMARY KEY, name VARCHAR(50));
+insert into o_rollcall values (1,'atharva');
+insert into o_rollcall values (2,'ram');
+insert into o_rollcall values (3,'shyam');
+insert into o_rollcall values (4,'sita');
+insert into o_rollcall values (5,'raju');
+insert into o_rollcall values (6,'virat');
+
+
+insert into n_rollcall values (1,'atharva');
+insert into n_rollcall values (9,'surya');
+insert into n_rollcall values (3,'shyam');
+create or replace procedure merging AS
+
+cursor rollcall is
+select roll_number, name from n_rollcall;
+v_count NUMBER;
+begin
+for i in rollcall loop
+select count(*) into v_count
+from o_rollcall where roll_number = i.roll_number;
+
+if v_count = 0 then
+insert into o_rollcall values (i.roll_number,i.name);
+end if;
+end loop;
+end;
+
+
+begin
+merging;
+end;
+
+select * from o_rollcall;

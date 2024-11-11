@@ -1,0 +1,64 @@
+use studentdb
+db.createCollection("student")
+
+db.student.insertMany([
+    { RollNo: "S101", name: "Alice", class: "TE", division: "A", marks: 85, sports: ["Football"] },
+    { RollNo: "S102", name: "Bob", class: "TE", division: "A", marks: 78, sports: ["Basketball"] },
+    { RollNo: "S103", name: "Charlie", class: "TE", division: "B", marks: 92, sports: ["Football"] },
+    { RollNo: "S104", name: "David", class: "TE", division: "B", marks: 64, sports: ["Cricket"] },
+    { RollNo: "S105", name: "Eva", class: "TE", division: "A", marks: 56, sports: ["Football"] },
+    { RollNo: "S106", name: "Frank", class: "TE", division: "B", marks: 70, sports: [] },
+    { RollNo: "S107", name: "Grace", class: "TE", division: "A", marks: 90, sports: [] },
+    { RollNo: "S108", name: "Heidi", class: "TE", division: "A", marks: 95, sports: ["Football"] },
+    { RollNo: "S109", name: "Ivy", class: "TE", division: "B", marks: 50, sports: ["Badminton"] },
+    { RollNo: "S110", name: "Jack", class: "TE", division: "A", marks: 45, sports: [] }
+])
+
+db.student.createIndex({ name: 1 })
+
+db.student.find({ name: "Alice" }).explain("executionStats")
+
+db.student.aggregate([
+    { $match: { class: "TE" } },
+    { $sort: { marks: -1 } },
+    { $limit: 5 }
+])
+
+db.student.aggregate([
+    { $match: { class: "TE" } },
+    { $sort: { marks: -1 } },
+    { $group: { _id: "$division", topper: { $first: "$marks" } } }
+])
+
+db.student.aggregate([
+    { $match: { class: "TE" } },
+    { $group: { _id: "$division", avgMarks: { $avg: "$marks" } } }
+])
+
+db.student.aggregate([
+    { $match: { class: "TE", division: "A" } },
+    { $project: { RollNo: 1, _id: 0 } }
+])
+
+
+db.student.aggregate([
+    { $match: { class: "TE", division: "A", marks: { $lt: 50 } } },
+    { $project: { name: 1, RollNo: 1, marks: 1, _id: 0 } }
+])
+
+db.student.aggregate([
+    { $project: { name: 1, class: 1, marks: 1, _id: 0 } }
+])
+
+
+db.student.aggregate([
+    { $match: { sports: "Football" } },
+    { $project: { name: 1, class: 1, sports: 1, _id: 0 } }
+])
+
+
+
+
+
+
+

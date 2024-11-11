@@ -1,0 +1,90 @@
+CREATE TABLE STUDENT (
+    Rno NUMBER PRIMARY KEY,
+    Name VARCHAR2(50),
+    TotMarks NUMBER,
+    Class VARCHAR2(20)
+);
+
+INSERT INTO STUDENT (Rno, Name, TotMarks, Class) VALUES (1, 'Alice', 85, 'Distinction');
+INSERT INTO STUDENT (Rno, Name, TotMarks, Class) VALUES (2, 'Bob', 65, 'FirstClass');
+INSERT INTO STUDENT (Rno, Name, TotMarks, Class) VALUES (3, 'Charlie', 55, 'HigherSecondClass');
+INSERT INTO STUDENT (Rno, Name, TotMarks, Class) VALUES (4, 'David', 45, 'SecondClass');
+INSERT INTO STUDENT (Rno, Name, TotMarks, Class) VALUES (5, 'Eva', 30, 'Fail');
+
+CREATE OR REPLACE FUNCTION Count_Class_Students
+RETURN VARCHAR2
+IS
+    v_distinction_count NUMBER;
+    v_first_class_count NUMBER;
+    v_higher_second_class_count NUMBER;
+    v_second_class_count NUMBER;
+    v_fail_count NUMBER;
+    result VARCHAR2(400);
+BEGIN
+    -- Counting Distinction students
+    SELECT COUNT(*) INTO v_distinction_count FROM STUDENT WHERE Class = 'Distinction';
+
+    -- Counting FirstClass students
+    SELECT COUNT(*) INTO v_first_class_count FROM STUDENT WHERE Class = 'FirstClass';
+
+    -- Counting HigherSecondClass students
+    SELECT COUNT(*) INTO v_higher_second_class_count FROM STUDENT WHERE Class = 'HigherSecondClass';
+
+    -- Counting SecondClass students
+    SELECT COUNT(*) INTO v_second_class_count FROM STUDENT WHERE Class = 'SecondClass';
+
+    -- Counting Fail students
+    SELECT COUNT(*) INTO v_fail_count FROM STUDENT WHERE Class = 'Fail';
+
+    -- Preparing the result string
+    result := 'Distinction: ' || v_distinction_count || ', ' ||
+              'First Class: ' || v_first_class_count || ', ' ||
+              'Higher Second Class: ' || v_higher_second_class_count || ', ' ||
+              'Second Class: ' || v_second_class_count || ', ' ||
+              'Fail: ' || v_fail_count;
+
+    -- Outputting the result using DBMS_OUTPUT
+    DBMS_OUTPUT.PUT_LINE(result);
+
+    -- Returning the result as a string
+    RETURN result;
+END;
+/
+
+DECLARE
+    result VARCHAR2(400);
+BEGIN
+    -- Calling the function and storing the result
+    result := Count_Class_Students;
+    
+    -- Displaying the result
+    DBMS_OUTPUT.PUT_LINE('Result: ' || result);
+END;
+/
+
+
+CREATE TABLE BOOKS (
+    Book_ID NUMBER PRIMARY KEY,
+    Book_Name VARCHAR2(100),
+    Author VARCHAR2(50)
+);
+CREATE TABLE BOOKS_LOG (
+    Book_ID NUMBER,
+    Book_Name VARCHAR2(100),
+    Author VARCHAR2(50),
+    
+);
+
+
+CREATE OR REPLACE TRIGGER trg_after_delete_books
+AFTER DELETE ON BOOKS
+FOR EACH ROW
+BEGIN
+    INSERT INTO BOOKS_LOG (Book_ID, Book_Name, Author)
+    VALUES (:OLD.Book_ID, :OLD.Book_Name, :OLD.Author);
+END;
+/
+
+
+
+

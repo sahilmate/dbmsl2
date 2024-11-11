@@ -1,0 +1,45 @@
+CREATE TABLE Student (
+    Roll NUMBER PRIMARY KEY,
+    Name VARCHAR2(50),
+    Attendance NUMBER(5),
+    status varchar2(15)
+);
+
+INSERT INTO Student VALUES (1, 'John Doe', 65.0, NULL);
+INSERT INTO Student VALUES (2, 'Jane Smith', 85.0, NULL);
+INSERT INTO Student VALUES (3, 'Alice Johnson', 72.0, NULL);
+INSERT INTO Student VALUES (4, 'Bob Brown', 90.0, NULL);
+
+DECLARE
+    v_roll NUMBER(10) := 2;
+    v_status VARCHAR2(15);
+    v_attend NUMBER(5);
+
+BEGIN
+    -- Prompt user to enter Roll number
+   
+
+    -- Retrieve attendance for the provided roll number
+    SELECT Attendance INTO v_attend FROM Student WHERE Roll = v_roll;
+
+    -- Check attendance and update status
+    IF v_attend < 75 THEN
+        v_status := 'Detained';
+        DBMS_OUTPUT.PUT_LINE('Term not granted');
+    ELSE
+        v_status := 'Not Detained';
+        DBMS_OUTPUT.PUT_LINE('Term granted');
+    END IF;
+
+    -- Update the status in the Student table
+    UPDATE Student SET Status = v_status WHERE Roll = v_roll;
+
+    COMMIT;
+
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Error: Roll number not found.');
+END;
+/
+
+select* from student;

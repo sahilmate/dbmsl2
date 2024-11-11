@@ -1,0 +1,78 @@
+use studentdb
+
+db.createCollection("customer")
+
+db.customer.insertMany([
+    { name: "Alice", email: "alice@example.com", profession: "Engineer", gender: "Female", bill_amount: 4500 },
+    { name: "Bob", email: "bob@example.com", profession: "Business", gender: "Male", bill_amount: 6000 },
+    { name: "Charlie", email: "charlie@example.com", profession: "Artist", gender: "Male", bill_amount: 5500 },
+    { name: "David", email: "david@example.com", profession: "Engineer", gender: "Male", bill_amount: 7000 },
+    { name: "Eva", email: "eva@example.com", profession: "Business", gender: "Female", bill_amount: 3500 },
+    { name: "Frank", email: "frank@example.com", profession: "Business", gender: "Male", bill_amount: 8000 },
+    { name: "Grace", email: "grace@example.com", profession: "Artist", gender: "Female", bill_amount: 6000 },
+    { name: "Hannah", email: "hannah@example.com", profession: "Engineer", gender: "Female", bill_amount: 4900 },
+    { name: "Ivy", email: "ivy@example.com", profession: "Business", gender: "Female", bill_amount: 6200 },
+    { name: "Jack", email: "jack@example.com", profession: "Artist", gender: "Male", bill_amount: 3500 }
+])
+
+var mapFunction = function() {
+    emit(this.gender, 1);
+};
+
+var reduceFunction = function(key, values) {
+    return Array.sum(values);
+};
+
+db.customer.mapReduce(mapFunction, reduceFunction, { out: "gender_count" });
+db.gender_count.find()
+
+
+var mapFunction = function() {
+    emit(this.profession, 1);
+};
+
+var reduceFunction = function(key, values) {
+    return Array.sum(values);
+};
+
+db.customer.mapReduce(mapFunction, reduceFunction, { out: "profession_count" });
+db.profession_count.find()
+
+db.customer.find({ bill_amount: { $gt: 5000 } })
+
+db.customer.updateOne(
+    { name: "Alice" },
+    { $inc: { bill_amount: 500 } }
+)
+
+db.customer.find({ name: { $regex: "^B" } })
+
+db.customer.find({ profession: "Business" })
+
+db.customer.find().sort({ bill_amount: -1 })
+
+
+db.customer.createIndex({ name: 1 })
+
+db.customer.find({ name: "Bob" }).explain("executionStats")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

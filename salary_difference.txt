@@ -1,0 +1,38 @@
+create table customer( ID NUMBER(5) PRIMARY KEY,
+    Name VARCHAR(50),
+    Age NUMBER(5),
+    Address VARCHAR(100),
+    Salary NUMBER(10));
+
+
+CREATE OR REPLACE TRIGGER slip6
+AFTER INSERT OR UPDATE OR DELETE ON CUSTOMER
+FOR EACH ROW
+BEGIN
+--for insering
+if inserting then
+    dbms_output.put_line('salary value inserted is:-' || :new.salary);
+
+--for updating
+elsif updating then
+    dbms_output.put_line('new salary'   || to_char(:new.salary));
+    dbms_output.put_line('old salary'     || to_char (:old.salary));
+    dbms_output.put_line('difference in them'    ||   to_char(:new.salary - :old.salary));
+
+--for deleting
+
+elsif deleting then 
+    dbms_output.put_line('deleted values:-' || :old.salary);
+
+end if;
+end;
+/
+
+
+insert into customer values(1,'abs',20, 'pune', 25000);
+insert into customer values(2,'pqr',19, 'mumbai', 78800);
+insert into customer values(3,'xyz',20, 'delhi', 34500);
+
+update customer set salary = 56740 where id = 3;
+
+delete from customer where id=2;

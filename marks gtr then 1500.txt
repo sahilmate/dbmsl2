@@ -1,0 +1,51 @@
+CREATE TABLE STUDENT (
+    Rno NUMBER PRIMARY KEY,
+    Name VARCHAR2(100) NOT NULL,
+    TotMarks NUMBER (10),
+    Class VARCHAR2(20) 
+);
+INSERT INTO STUDENT (Rno, Name, TotMarks) VALUES (1, 'Alice', 1200);
+INSERT INTO STUDENT (Rno, Name, TotMarks) VALUES (2, 'Bob', 950);
+INSERT INTO STUDENT (Rno, Name, TotMarks) VALUES (3, 'Charlie', 870);
+INSERT INTO STUDENT (Rno, Name, TotMarks) VALUES (4, 'Diana', 750);
+INSERT INTO STUDENT (Rno, Name, TotMarks) VALUES (5, 'Eve', 550);
+
+CREATE OR REPLACE PROCEDURE update_student_class AS
+BEGIN
+    -- Update class to 'Distinction' for marks between 990 and 1500
+    UPDATE STUDENT
+    SET Class = 'Distinction'
+    WHERE TotMarks BETWEEN 990 AND 1500;
+
+    -- Update class to 'First Class' for marks between 900 and 989
+    UPDATE STUDENT
+    SET Class = 'First Class'
+    WHERE TotMarks BETWEEN 900 AND 989;
+
+    -- Update class to 'Higher Second Class' for marks between 825 and 899
+    UPDATE STUDENT
+    SET Class = 'Higher Second Class'
+    WHERE TotMarks BETWEEN 825 AND 899;
+
+    -- Update class to 'Second Class' for marks between 600 and 824
+    UPDATE STUDENT
+    SET Class = 'Second Class'
+    WHERE TotMarks BETWEEN 600 AND 824;
+
+    -- Update class to 'Fail' for marks less than 600
+    UPDATE STUDENT
+    SET Class = 'Fail'
+    WHERE TotMarks < 600;
+
+    
+    DBMS_OUTPUT.PUT_LINE('Class updated for all students based on marks.');
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('An unexpected error occurred: ' || SQLERRM);
+END;
+/
+
+BEGIN
+    update_student_class;
+END;
+/

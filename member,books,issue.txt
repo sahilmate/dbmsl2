@@ -1,0 +1,89 @@
+-- Creating the MEMBERS table
+CREATE TABLE MEMBERS (
+    member_id NUMBER PRIMARY KEY, 
+    member_name VARCHAR2(100) NOT NULL, 
+    address VARCHAR2(200), 
+    phone_number VARCHAR2(15) UNIQUE
+);
+
+-- Creating the BOOKS table
+CREATE TABLE BOOKS (
+    book_id NUMBER PRIMARY KEY, 
+    book_name VARCHAR2(100) NOT NULL, 
+    publisher VARCHAR2(100), 
+    price NUMBER(6,2), 
+    date_of_publication DATE, 
+    book_status VARCHAR2(20)
+);
+
+-- Creating the ISSUE_RETURN table
+CREATE TABLE ISSUE_RETURN (
+    member_id NUMBER, 
+    book_id NUMBER, 
+    issue_date DATE, 
+    return_date DATE, 
+    fine_amount NUMBER(6,2) DEFAULT 0,
+    PRIMARY KEY (member_id, book_id), 
+    FOREIGN KEY (member_id) REFERENCES MEMBERS(member_id),
+    FOREIGN KEY (book_id) REFERENCES BOOKS(book_id)
+);
+
+-- Creating the PL/SQL procedure to calculate the fine and update the return status
+CREATE OR REPLACE PROCEDURE return_book (
+    p_member_id IN NUMBER, 
+    p_book_id IN NUMBER, 
+    p_issue_date IN DATE
+) IS
+    v_return_date DATE;
+    v_fine_amount NUMBER(6,2) := 0;
+    v_book_status VARCHAR2(20);
+    v_due_days NUMBER;
+BEGIN
+    -- Fetching the current status of the book
+    SELECT book_status 
+    INTO v_book_status
+    FROM BOOKS 
+    WHERE book_id = p_book_id;
+
+    -- Checking if the book is issued
+    IF v_book_status = 'Issued' THEN
+        -- Fetching the return date from ISSUE_RETURN table
+        SELECT return_date 
+        INTO v_return_date 
+        FROM ISSUE_RETURN 
+        WHERE member_id = p_member_id AND book_id = p_book_id;
+        
+        -- Calculating fine (assuming fine is 5 per day after due date)
+        v_due_days := (SYSDATE - v_return_date);
+        
+        IF v_due_days > 0 THEN
+            v_fine_amount := v_due_days * 5;  -- Fine calculation (5 per day)
+        END IF;
+        
+        -- Updating the fine in ISSUE_RETURN table
+        UPDATE ISSUE_RETURN
+        SET fine_amount = v_fine_amount, return_date = SYSDATE
+        WHERE member_id = p_member_id AND book_id = p_book_id;
+        
+        -- Updating the book status to 'Available' after return
+        UPDATE BOOKS
+        SET book_status = 'Available'
+        WHERE book_id = p_book_id;
+
+        COMMIT;
+        DBMS_OUTPUT.PUT_LINE('Book returned successfully. Fine: ' || v_fine_amount);
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Book is not issued.');
+    END IF;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('No record found for the given member or book.');
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('An error occurred: ' || SQLERRM);
+END;
+/
+
+begin
+return_book;
+end;
+/

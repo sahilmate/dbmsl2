@@ -1,0 +1,56 @@
+CREATE TABLE Student_marks (
+    Roll_number NUMBER PRIMARY KEY,
+    stud_name VARCHAR(50),
+    Marks NUMBER
+);
+
+CREATE TABLE resultt (
+    Roll_number NUMBER PRIMARY KEY,
+    stud_name VARCHAR(50),
+    classs VARCHAR(20)
+);
+
+CREATE OR REPLACE PROCEDURE proc_grade(
+    p_roll IN NUMBER, 
+    p_name IN VARCHAR, 
+    p_marks IN NUMBER, 
+    p_category OUT VARCHAR
+) 
+AS
+BEGIN
+    
+    IF p_marks >= 990 AND p_marks <= 1500 THEN   -- if marks great than = 990 and less = 1500 then distinction
+         p_category := 'Distinction';
+    ELSIF p_marks >= 900 AND p_marks <= 989 THEN  -- if marks great than = 900 and less = 989 then first class
+         p_category := 'First Class';
+    ELSIF p_marks >= 825 AND p_marks <= 899 THEN -- if marks great than = 825 and less = 899 then higher second class
+         p_category := 'Higher Second Class';
+    ELSE
+         p_category := 'Second Class';
+    END IF;
+
+    -- inserting values in resultt table 
+    INSERT INTO resultt (Roll_number,stud_name, classs)
+    VALUES (p_roll, p_name, p_category);
+END category_marks;
+
+
+
+DECLARE
+    call_category VARCHAR(20); 
+    call_roll NUMBER := 3;
+    call_name VARCHAR(50) := 'shivam k';
+    call_marks NUMBER := 750;
+BEGIN
+    -- procedure calling
+    category_marks(call_roll, call_name, call_marks, call_category);
+
+  
+    DBMS_OUTPUT.PUT_LINE('Student:- ' || call_name || ' with Roll No:- ' || call_roll || ' has been placed in:- ' || call_category);
+END;
+
+
+
+
+
+SELECT * FROM resultt;

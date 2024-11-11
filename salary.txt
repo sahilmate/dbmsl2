@@ -1,0 +1,44 @@
+create table emp (emp_no NUMBER(10) primary key,emp_name VARCHAR(50),emp_salary NUMBER(15));
+
+create table trackingg (emp_no NUMBER(10) primary key,emp_salary NUMBER(15));
+
+create or replace trigger slip3 
+after
+insert or update or delete on
+emp 
+for each row
+begin
+
+if inserting then
+
+if :new.emp_salary <  50000 then
+insert into trackingg values (:new.emp_no,:new.emp_salary);
+end if;
+
+elsif updating then
+
+if :new.emp_salary <  50000 then
+insert into trackingg values (:new.emp_no,:new.emp_salary);
+end if;
+
+
+elsif deleting then
+if :old.emp_salary < 50000 then
+insert into trackingg values (:old.emp_no,:old.emp_salary);
+end if;
+
+end if;
+
+end;
+/
+
+
+
+insert into emp values(1,'abc',2800);
+insert into emp values(2,'pqr',56780);
+
+select * from trackingg;
+select * from emp;
+update emp set emp_salary = 49000 where emp_no = 2;
+
+delete from emp where emp_no = 4;
